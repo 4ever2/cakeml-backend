@@ -1,0 +1,11 @@
+all: Makefile.rocq
+	$(MAKE) -f Makefile.rocq
+
+clean: Makefile.rocq
+	$(MAKE) -f Makefile.rocq clean
+
+Makefile.rocq:
+	rocq makefile -f _RocqProject -o Makefile.rocq
+
+.PHONY: all clean
+
