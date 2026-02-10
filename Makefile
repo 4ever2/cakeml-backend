@@ -7,5 +7,7 @@ clean: Makefile.rocq
 Makefile.rocq:
 	rocq makefile -f _RocqProject -o Makefile.rocq
 
-.PHONY: all clean
+install: Makefile.rocq
+	+@make -f Makefile.rocq install
 
+.PHONY: all clean install
