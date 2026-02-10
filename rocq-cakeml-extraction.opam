@@ -22,6 +22,11 @@ depends: [
   "rocq-metarocq-pcuic" {= "1.4+9.0"}
   "rocq-metarocq-safechecker" {= "1.4+9.0"}
   "rocq-metarocq-erasure" {= "1.4+9.0"}
+  "coq-ceres" {= "dev"}
+]
+
+pin-depends: [
+  ["coq-ceres.dev" "git+https://github.com/4ever2/rocq-ceres.git#01bee32638df4b6180b3e9ee70beed11150a5da0"]
 ]
 
 build: [ make "build" ]
