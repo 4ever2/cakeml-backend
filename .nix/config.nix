@@ -23,6 +23,5 @@
   cachix.math-comp = {};
   cachix.coq-community = {};
   cachix.metarocq = {};
-
-  cachix.peregrine.authToken = "CACHIX_AUTH_TOKEN";
+  cachix.peregrine = {};
 }

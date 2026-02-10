@@ -1,4 +1,6 @@
-all: Makefile.rocq
+all: build
+
+build: Makefile.rocq
 	$(MAKE) -f Makefile.rocq
 
 clean: Makefile.rocq
@@ -10,4 +12,4 @@ Makefile.rocq:
 install: Makefile.rocq
 	+@make -f Makefile.rocq install
 
-.PHONY: all clean install
+.PHONY: all build clean install

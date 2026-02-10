@@ -33,12 +33,11 @@ jobs:
       uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup peregrine
+    - name: Cachix setup coq
       uses: cachix/cachix-action@v16
       with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        extraPullNames: coq, coq-community, math-comp, metarocq
-        name: peregrine
+        extraPullNames: coq-community, math-comp, metarocq, peregrine
+        name: coq
     - id: stepGetDerivation
       name: Getting derivation for current job (CakeMLExtraction)
       run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
@@ -105,12 +104,11 @@ jobs:
       uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup peregrine
+    - name: Cachix setup coq
       uses: cachix/cachix-action@v16
       with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        extraPullNames: coq, coq-community, math-comp, metarocq
-        name: peregrine
+        extraPullNames: coq-community, math-comp, metarocq, peregrine
+        name: coq
     - id: stepGetDerivation
       name: Getting derivation for current job (ceres)
       run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
@@ -171,12 +169,11 @@ jobs:
       uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup peregrine
+    - name: Cachix setup coq
       uses: cachix/cachix-action@v16
       with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        extraPullNames: coq, coq-community, math-comp, metarocq
-        name: peregrine
+        extraPullNames: coq-community, math-comp, metarocq, peregrine
+        name: coq
     - id: stepGetDerivation
       name: Getting derivation for current job (coq)
       run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
@@ -230,12 +227,11 @@ jobs:
       uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup peregrine
+    - name: Cachix setup coq
       uses: cachix/cachix-action@v16
       with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        extraPullNames: coq, coq-community, math-comp, metarocq
-        name: peregrine
+        extraPullNames: coq-community, math-comp, metarocq, peregrine
+        name: coq
     - id: stepGetDerivation
       name: Getting derivation for current job (metarocq)
       run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
