@@ -6,4 +6,4 @@ updates:
       interval: "weekly"
       day: "monday"
     labels:
-      - "part: dependencies"
+      - "dependencies"
