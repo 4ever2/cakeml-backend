@@ -128,7 +128,7 @@ Fixpoint  to_sexp_binding (a : pat) : sexp :=
 	match a with
 	| Pany => Atom "Pany"
 	| Plit (StrLit l) => [Atom "Plit"; Atom "StrLit";to_sexp l]
-	| Pvar v => [Atom "Pvar";to_sexp v]
+	| Pvar v => to_sexp v
   | Pcon n nil =>  [(Atom "Pcon"); (to_sexp n); Atom "nil"]
 	| Pcon n p =>  [(Atom "Pcon"); (to_sexp n); ( @Serialize_list _ to_sexp_binding p)]
 	| Pas p n =>    [Atom "Pas";to_sexp_binding p; to_sexp n]
