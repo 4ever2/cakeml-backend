@@ -207,7 +207,7 @@ End binders.  *)
 Definition global_serializer : Serialize (bytestring.string * option exp) :=
 	fun '(i, b) => 
 	match b with
-	| Some x => to_sexp (String.to_string ("def_" ++ i)%bs, x)
+	| Some x => Cons (Atom "Dlet") (Cons ([Atom "unk"; Atom "unk"]) (to_sexp (String.to_string ("def_" ++ i)%bs, x)))
 	| None =>  
 		let na :=  (String.to_string ("def_" ++ i)%bs) in
 		List ( Atom (Raw ("$" ++ na)) :: [Atom "global" ; Atom (Raw ("$Axioms")) ; Atom (Raw ("$" ++ na)) ]:: nil)
@@ -264,4 +264,4 @@ Definition Serialize_module (names : list bytestring.string) :=
     let longnames : list sexp := List.map (fun name => (to_sexp ("def_" ++ name)%bs)) names in
     let allnames := List.combine shortnames longnames in
     let exports : list sexp := List.map (fun shortname => Atom ( String.to_string shortname)%string) shortnames in
-		Cons (Atom "module") ( @Serialize_list _ global_serializer (List.rev (((main, Some x) :: m)%list))).
+		 ( @Serialize_list _ global_serializer (List.rev (((main, Some x) :: m)%list))).
