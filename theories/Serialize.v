@@ -97,14 +97,24 @@ Definition App_sexp (l1 : sexp) (l2 : sexp) :=
 (* Definition before_dot s := fst (split_dot EmptyString EmptyString s). *)
 (* Definition after_dot s := snd (split_dot EmptyString EmptyString s). *)
 
-Fixpoint id_to_list (i:id):list (sexp*string) :=
-	match i with 
-	| Short n =>  [(Atom "Short",n)]
-	| Long n m => (Atom "Long",n) :: (id_to_list m)
-	end.
+(* Fixpoint id_to_list (i:id):list (sexp*string) := *)
+(* 	match i with  *)
+(* 	| Short n =>  [(Atom "Short",n)] *)
+(* 	| Long n m => (Atom "Long",n) :: (id_to_list m) *)
+(* 	end. *)
 
 #[export] Instance Serialize_id : Serialize id :=
-	fun a => List (map (fun '(constr,var) => [constr;(to_sexp var)]) (id_to_list a)). 
+	fun a =>
+    match a with
+    | Short str => Atom (Str str)
+    | _ => Atom "notsupported"
+    end.
+
+#[export] Instance Serialize_id_option : Serialize (option id) :=
+	fun a => match a with 
+			     | None => Atom "NONE"
+			     | Some n => [Atom "SOME";to_sexp n]
+			     end.
 
 #[export] Instance Serialize_var_option : Serialize (option varN) :=
 	fun a => match a with 
@@ -129,7 +139,8 @@ Fixpoint to_sexp_t (a : exp) : sexp :=
 	| Raise e => [Atom "Raise"; to_sexp_t e]
 	| Handle e pes =>
 		Cons (Atom "Handle") (Cons (to_sexp_t e) ( @Serialize_list _ (fun '(p,e) => App_sexp  (to_sexp_binding p) ([to_sexp_t e])) pes))
-	| Con cn es => [Atom "Con";  to_sexp cn; ( @Serialize_list _ (fun e =>to_sexp_t e) es)]
+  | Con cn nil => [Atom "Con";  to_sexp cn; Atom "nil"]
+  | Con cn es => [Atom "Con";  to_sexp cn; ( @Serialize_list _ (fun e =>to_sexp_t e) es)]
 	| Var x => [Atom "Var";to_sexp x]
 	| App op es => List (Atom "App"::Atom "Opapp":: (map to_sexp_t es))
 	| Fun x e =>   [Atom "Fun"; (to_sexp x); (to_sexp_t e)]
