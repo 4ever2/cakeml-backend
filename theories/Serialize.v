@@ -143,7 +143,11 @@ Fixpoint to_sexp_t (a : exp) : sexp :=
   | Con cn nil => [Atom "Con";  to_sexp cn; Atom "nil"]
   | Con cn es => [Atom "Con";  to_sexp cn; ( @Serialize_list _ (fun e =>to_sexp_t e) es)]
 	| Var x => [Atom "Var"; to_sexp x]
-	| App op es => List (Atom "App"::Atom "Opapp":: (map to_sexp_t es))
+	| App op es =>
+		[ (Atom "App");
+			(Atom "Opapp");
+			(@Serialize_list _ (fun e => to_sexp_t e) es)
+		]
 	| Fun x e =>   [Atom "Fun"; (to_sexp x); (to_sexp_t e)]
 	| Let n e1 e2 => [Atom "Let"; to_sexp n; to_sexp_t e1; to_sexp_t e2]
 	| Mat m p => [ (Atom "Mat") ; to_sexp_t m ; @Serialize_list _ (fun '(p,e) => [ to_sexp_binding p; Atom "Lannot"; to_sexp_t e; [Atom "unk"; Atom "unk"]  ]) p]
