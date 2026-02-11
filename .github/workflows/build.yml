@@ -1,0 +1,63 @@
+name: Build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - 'main'
+    paths-ignore:
+    - '**.md'
+    - '**.opam'
+    - 'LICENSE'
+  pull_request:
+    paths-ignore:
+    - '**.md'
+    - '**.opam'
+    - 'LICENSE'
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+permissions:
+  contents: read
+env:
+  JOBS: 4
+jobs:
+  build:
+    name: OCaml ${{ matrix.ocaml_version }} build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04]
+        ocaml_version: ["4.14.2", "5.3.0"]
+    steps:
+      - name: Checkout branch ${{ github.ref_name }}
+        uses: actions/checkout@v6
+
+      - run: sudo apt-get update
+      - name: Restore opam cache
+        id: opam-cache
+        uses: actions/cache@v5
+        with:
+          path: "~/.opam"
+          key: opam-${{matrix.ocaml_version}}-${{hashFiles('.github/rocq-cakeml-extraction.opam.locked')}}
+          restore-keys: |
+            opam-${{matrix.ocaml_version}}-
+
+      - name: Set up OCaml
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{matrix.ocaml_version}}
+
+      - name: Build dependencies
+        run: |
+          opam repo add rocq-released https://rocq-prover.org/opam/released
+          opam install --deps-only -j${{ env.JOBS }} .github/rocq-cakeml-extraction.opam.locked
+          opam clean -a -c -s --logs
+
+      - name: Lint opam file
+        run: |
+          opam lint
+
+      - name: Build
+        run: |
+          opam exec -- make
