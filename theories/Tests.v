@@ -51,4 +51,6 @@ End something.
 Notation "'Extraction' a" :=
 	(extract a) (at level 1, a at level 2).
 
-MetaRocq Run Extraction (Some true).
+MetaRocq Run Extraction (fun x => match x with true => true | false => false end).
+
+((Dtype ((0 0) unk) ((nil "bool" ("FF") ("TT")))) (Dletrec ((2 0) unk) (("f" "x" Lannot (Mat (Lannot (Var (Short "x")) ((2 20) (2 21))) (((Pcon (SOME (Short "TT")) nil) Lannot (Con (SOME (Short "FF")) nil) ((2 35) (2 37))) ((Pcon (SOME (Short "FF")) nil) Lannot (Con (SOME (Short "TT")) nil) ((2 50) (2 52))))) ((2 14) unk)))))%                          
