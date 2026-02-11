@@ -108,8 +108,8 @@ Fixpoint id_to_list (i:id):list (sexp*string) :=
 
 #[export] Instance Serialize_var_option : Serialize (option varN) :=
 	fun a => match a with 
-			| None => Atom "None"
-			| Some n => [Atom "Some";to_sexp n]
+			| None => Atom "NONE"
+			| Some n => [Atom "SOME";to_sexp n]
 			end.
 
 
