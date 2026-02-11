@@ -106,7 +106,7 @@ Definition App_sexp (l1 : sexp) (l2 : sexp) :=
 #[export] Instance Serialize_id : Serialize id :=
 	fun a =>
     match a with
-    | Short str => Atom (Str str)
+    | Short str => [Atom "Short" ; Atom (Str str)]
     | _ => Atom "notsupported"
     end.
 
@@ -218,9 +218,9 @@ End binders.  *)
 Definition global_serializer : Serialize (bytestring.string * option exp) :=
 	fun '(i, b) => 
 	match b with
-	| Some x => Cons (Atom "Dlet") (Cons ([Atom "unk"; Atom "unk"]) (to_sexp (String.to_string ("def_" ++ i)%bs, x)))
+	| Some x => Cons (Atom "Dlet") (Cons ([Atom "unk"; Atom "unk"]) (to_sexp (String.to_string (i)%bs, x)))
 	| None =>  
-		let na :=  (String.to_string ("def_" ++ i)%bs) in
+		let na :=  (String.to_string (i)%bs) in
 		List ( Atom (Raw ("$" ++ na)) :: [Atom "global" ; Atom (Raw ("$Axioms")) ; Atom (Raw ("$" ++ na)) ]:: nil)
 	end. 
 
@@ -261,8 +261,6 @@ Definition global_serializer : Serialize (bytestring.string * option exp) :=
   to_string (shared_lib_register "malfunction"%bs "register"%bs ("foo.test", "test")%bs). *)
 
 
-
-
 Definition Serialize_module (names : list bytestring.string) :=
   fun '(m, x) =>    
     let name : bs := match m with
@@ -270,9 +268,9 @@ Definition Serialize_module (names : list bytestring.string) :=
 							| nil => ""%bs
 						end in
     let main := "main"%bs in 
-    let names := (names ++ ["main"%bs])%list in
-    let shortnames : list bs := List.map (fun name => (* uncapitalize *) (thename nil name)) names in
-    let longnames : list sexp := List.map (fun name => (to_sexp ("def_" ++ name)%bs)) names in
-    let allnames := List.combine shortnames longnames in
-    let exports : list sexp := List.map (fun shortname => Atom ( String.to_string shortname)%string) shortnames in
+    (* let names := (names ++ ["main"%bs])%list in *)
+    (* let shortnames : list bs := List.map (fun name => (* uncapitalize *) (thename nil name)) names in *)
+    (* let longnames : list sexp := List.map (fun name => (to_sexp ("def_" ++ name)%bs)) names in *)
+    (* let allnames := List.combine shortnames longnames in *)
+    (* let exports : list sexp := List.map (fun shortname => Atom ( String.to_string shortname)%string) shortnames in *)
 		 ( @Serialize_list _ global_serializer (List.rev (((main, Some x) :: m)%list))).

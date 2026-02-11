@@ -51,4 +51,4 @@ End something.
 Notation "'Extraction' a" :=
 	(extract a) (at level 1, a at level 2).
 
-MetaRocq Run Extraction true.
+MetaRocq Run Extraction (Some true).
