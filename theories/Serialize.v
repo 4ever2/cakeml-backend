@@ -249,9 +249,14 @@ End binders.  *)
 Definition global_serializer : Serialize (bytestring.string * option exp) :=
 	fun '(i, b) =>
 	match b with
-	| Some x => Cons (Atom "Dlet") (Cons ([Atom "unk"; Atom "unk"]) (to_sexp (String.to_string (i)%bs, x)))
+	| Some x =>
+		[ (Atom "Dlet");
+	    ([Atom "unk"; Atom "unk"]);
+			(to_sexp (String.to_string (i)%bs));
+			(to_sexp x)
+		]
 	| None =>
-		let na :=  (String.to_string (i)%bs) in
+		let na := (String.to_string (i)%bs) in
 		List ( Atom (Raw ("$" ++ na)) :: [Atom "global" ; Atom (Raw ("$Axioms")) ; Atom (Raw ("$" ++ na)) ]:: nil)
 	end.
 
