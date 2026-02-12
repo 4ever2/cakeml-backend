@@ -110,27 +110,43 @@ Definition App_sexp (l1 : sexp) (l2 : sexp) :=
     | _ => Atom "notsupported"
     end.
 
-#[export] Instance Serialize_id_option : Serialize (option id) :=
-	fun a => match a with
-			     | None => Atom "NONE"
-			     | Some n => [Atom "SOME";to_sexp n]
-			     end.
+#[local]
+Instance Serialize_cakeml_option {A : Type} `{Serialize A} : Serialize (option A) :=
+	fun a =>
+		match a with
+		| None => Atom "NONE"
+		| Some n => [Atom "SOME"; to_sexp n]
+		end.
 
-#[export] Instance Serialize_var_option : Serialize (option varN) :=
-	fun a => match a with
-			| None => Atom "NONE"
-			| Some n => [Atom "SOME";to_sexp n]
-			end.
+#[local]
+Instance Serialize_cakeml_list {A : Type} `{serA : Serialize A} : Serialize (list A) :=
+	fun a =>
+		match a with
+		| []%list => Atom "nil"
+		| l => @Serialize_list A serA l
+		end.
 
+#[local]
+Instance Serialize_cakeml_pair {A B : Type} `{Serialize A} `{Serialize B} : Serialize (A * B) :=
+	fun '(a,b) =>
+		let sexp_a := to_sexp a in
+		let sexp_b := to_sexp b in
+		match sexp_b with
+		| Atom_ x =>
+			(* If both are atoms we serialize as expected *)
+			[sexp_a; sexp_b]
+		| List l =>
+			(* If b is a list then CakeML sexp parser expects it to not be nested.
+				Only a is allowed to be a nested list *)
+			List (sexp_a :: l)
+		end.
 
-
-Fixpoint  to_sexp_binding (a : pat) : sexp :=
+Fixpoint to_sexp_binding (a : pat) : sexp :=
 	match a with
 	| Pany => Atom "Pany"
 	| Plit (StrLit l) => [Atom "Plit"; Atom "StrLit";to_sexp l]
 	| Pvar v => to_sexp v
-  | Pcon n nil =>  [(Atom "Pcon"); (to_sexp n); Atom "nil"]
-	| Pcon n p =>  [(Atom "Pcon"); (to_sexp n); ( @Serialize_list _ to_sexp_binding p)]
+	| Pcon n p => [Atom "Pcon"; to_sexp n; (@Serialize_cakeml_list _ to_sexp_binding p)]
 	| Pas p n =>    [Atom "Pas";to_sexp_binding p; to_sexp n]
 	end.
 
@@ -139,27 +155,27 @@ Fixpoint to_sexp_t (a : exp) : sexp :=
 	| Lit (StrLit l) => [Atom "Lit"; Atom "Strlit"; to_sexp l]
 	| Raise e => [Atom "Raise"; to_sexp_t e]
 	| Handle e pes =>
-		Cons (Atom "Handle") (Cons (to_sexp_t e) ( @Serialize_list _ (fun '(p,e) => App_sexp  (to_sexp_binding p) ([to_sexp_t e])) pes))
+		[ (Atom "Handle");
+			(to_sexp_t e);
+			(@Serialize_cakeml_list _ (@Serialize_cakeml_pair _ _ to_sexp_binding to_sexp_t) pes)
+		]
   | Con cn nil => [Atom "Con";  to_sexp cn; Atom "nil"]
-  | Con cn es => [Atom "Con";  to_sexp cn; ( @Serialize_list _ (fun e =>to_sexp_t e) es)]
+  | Con cn es => [Atom "Con";  to_sexp cn; ( @Serialize_cakeml_list _ (fun e =>to_sexp_t e) es)]
 	| Var x => [Atom "Var"; to_sexp x]
 	| App op es =>
 		[ (Atom "App");
 			(Atom "Opapp");
-			(@Serialize_list _ (fun e => to_sexp_t e) es)
+			(@Serialize_cakeml_list _ (fun e => to_sexp_t e) es)
 		]
 	| Fun x e =>   [Atom "Fun"; (to_sexp x); (to_sexp_t e)]
 	| Let n e1 e2 => [Atom "Let"; to_sexp n; to_sexp_t e1; to_sexp_t e2]
-	| Mat m p => [ (Atom "Mat") ; to_sexp_t m ; @Serialize_list _ (fun '(p,e) => [ to_sexp_binding p; Atom "Lannot"; to_sexp_t e; [Atom "unk"; Atom "unk"]  ]) p]
+	| Mat m p => [ (Atom "Mat") ; to_sexp_t m ; @Serialize_cakeml_list _ (@Serialize_cakeml_pair _ _ to_sexp_binding to_sexp_t) p]
 	| Letrec fs e =>
 		[ (Atom "Letrec");
 			(@Serialize_list _ (fun '(f,x,e') =>
-				[ (to_sexp f);
-					(to_sexp x);
-					Atom "Lannot";
-					to_sexp_t e';
-					[Atom "unk"; Atom "unk"]
-				]) fs);
+				(@Serialize_cakeml_pair _ _ _ (@Serialize_cakeml_pair _ _ _ to_sexp_t))
+				(f, (x, e')))
+			fs);
 			(to_sexp_t e)
 		]
 	end.
