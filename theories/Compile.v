@@ -19,22 +19,6 @@ Equations map2_InP (l1 : list A1) (l2 : list A2) (f : forall x1 x2, In x1 l1 -> 
     map2_InP _ _ f := nil.
 End Map2InP.
 
-(* Lemma mapi_InP_spec' {A B : Type} (f : nat -> A -> B) (l : list A) n : *)
-(* 	mapi_InP l n (fun n (x : A) _ => f n x) = mapi_rec f l n. *)
-(* Proof. *)
-(*   remember (fun n (x : A) _ => f n x) as g. *)
-(*   funelim (mapi_InP l n g); simpl. reflexivity. *)
-(*   simp mapi_InP. *)
-(*   f_equal.  *)
-(*   now rewrite (H f0). *)
-(* Qed. *)
-
-(* Lemma mapi_InP_spec {A B : Type} (f : nat -> A -> B) (l : list A) : *)
-(*   mapi_InP l 0 (fun n (x : A) _ => f n x) = mapi f l. *)
-(* Proof. *)
-(*   eapply mapi_InP_spec'. *)
-(* Qed. *)
-
 Section MapiInP.
 	Context {A B : Type}.
 
@@ -49,7 +33,7 @@ Proof.
   remember (fun n (x : A) _ => f n x) as g.
   funelim (mapi_InP l n g); simpl. reflexivity.
   simp mapi_InP.
-  f_equal. 
+  f_equal.
   now rewrite (H f0).
 Qed.
 
@@ -61,10 +45,10 @@ Qed.
 
  Definition blocks_until i (num_args : list nat) :=
 	#| filter (fun x => match x with 0 => false | _ => true end) (firstn i num_args)|.
- 
+
  Definition nonblocks_until i num_args :=
     #| filter (fun x => match x with 0 => true | _ => false end) (firstn i num_args)|.
- 
+
 From MetaRocq Require Import EAst.
 
 Section Compile.
@@ -86,16 +70,9 @@ Definition lookup_constructor_names (e : global_declarations) (ind : Kernames.in
   match lookup_inductive e ind with
   | Some (mdecl, idecl) => Some (map cstr_nargs idecl.(ind_ctors))
   | None => None
-  end. 
+  end.
 
 Obligation Tactic := idtac.
-
-(* Fixpoint is_wf_rec_body (e : exp) : bool :=
-    match e with
-    | Fun _ _ => true
-    | Let _ _  e2 => is_wf_rec_body e2
-    | _ => false
-    end. *)
 
 Definition force_lambda (e : exp) :=
 	match e with
@@ -109,17 +86,17 @@ Equations? compile (t: term) : exp
 	by wf t (fun x y : EAst.term => size x < size y) :=
 	| tVar na =>  Var (Short (String.to_string na))
 	| tLambda nm bod =>   Fun (String.to_string (BasicAst.string_of_name nm))  (compile bod)
-	| tLetIn nm dfn bod => 
+	| tLetIn nm dfn bod =>
 		Let (Some (String.to_string (BasicAst.string_of_name nm ))) (compile dfn) (compile bod)
-	| tApp fn arg => 
+	| tApp fn arg =>
 		App Opapp [compile fn;compile arg]
-	| tConst nm => Var (Short (String.to_string (Kernames.string_of_kername nm))) 
-	| tConstruct i m args => 
+	| tConst nm => Var (Short (String.to_string (Kernames.string_of_kername nm)))
+	| tConstruct i m args =>
 		match lookup_constructor_names Σ i with
 		| Some names_args => Con (Some (Short (String.to_string (nth m names_args "")))) (map_InP args (fun x (H : In x args) => compile x))
 		| None => Error "error: inductive not found"
 		end
-	| tCase i mch brs => 
+	| tCase i mch brs =>
 		match lookup_constructor_names Σ (fst i) with
 		| Some names_args =>
 			Mat (compile mch) (map2_InP names_args brs (fun name '(binders, body) _ _ => (Pcon (Some (Short (String.to_string name))) (rev (map (fun x => Pvar (String.to_string (BasicAst.string_of_name x))) binders)), compile body)))
@@ -132,39 +109,30 @@ Equations? compile (t: term) : exp
 					(String.to_string (BasicAst.string_of_name (d.(dname))), arg , expr)) in
 			Letrec bodies (Var ( Short(fst (fst (nth idx bodies (String.to_string "", String.to_string "", Lit (StrLit "")))))))
 
-		
-	| tProj (Kernames.mkProjection ind _ nargs) bod => Raise (Lit( StrLit "inductive not found")) (* with lookup_record_projs Σ ind := 
-		{ | Some args => Raise (Lit( StrLit "inductive not found"))
-			(*
-			let len := List.length args in
-			Mfield (int_of_nat (len - 1 - nargs), compile bod)*)
-		| None =>  Raise (Lit( StrLit "inductive not found")) }*)
+
+	| tProj (Kernames.mkProjection ind _ nargs) bod => Raise (Lit( StrLit "inductive not found"))
 	| tPrim (existT (EPrimitive.primIntModel i)) => Error "ignore for now"
 	| tPrim (existT (EPrimitive.primFloatModel f)) =>  Error "ignore for now"
 	| tPrim (existT (EPrimitive.primStringModel s)) => Error "ignore for now"
 	| tPrim (existT (EPrimitive.primArrayModel a)) => Error  "ignore for now"
-(**		let default := compile (EPrimitive.array_default a) in
-		let values := map_InP (EPrimitive.array_value a) (fun v H => compile v) in
-		let arr := compile_array values default in
-		Mapply (Mglobal "PArray.of_array", [ arr ; default ])*)
 	| tLazy t => Raise (Lit( StrLit "error: tLazy not supported"))
 	| tForce t =>  Raise (Lit( StrLit  "error: tForce not supported"))
 	| tRel n => Raise (Lit( StrLit  "error: tRel has been translated away"))
 	| tBox => Raise (Lit( StrLit "error: tBox has been translated away"))
 	| tCoFix mfix idx => Raise (Lit( StrLit "error: tCofix not supported"))
 	| tEvar _ _ => Raise (Lit( StrLit  "error: tEvar not supported")).
-	Proof. 
+	Proof.
 	all: try (cbn; lia).
 		- simpl. clear compile. induction args.
 			+ easy.
 			+ inversion H.
 				* simpl. rewrite H0. lia.
 				* apply IHargs in H0.
-					simpl. 
+					simpl.
 					rewrite <- Nat.add_succ_l.
 					rewrite <- Nat.add_succ_r.
 					lia.
-		- simpl. set (y:=(binders,body)). 
+		- simpl. set (y:=(binders,body)).
 			assert (body = snd y) by easy.
 			rewrite H.
 			rewrite <- Nat.add_succ_l.
@@ -173,20 +141,12 @@ Equations? compile (t: term) : exp
 		- simpl. apply Nat.lt_lt_succ_r. eapply (In_size (fun x => dbody x) size H).
 	Qed.
 
-
-    (**  - eapply (In_size id size) in H. cbn in *.  
-        unfold id in H. change (fun x => size x) with size in H. lia.
-      - eapply (In_size snd size) in H. cbn in *.
-        lia.
-      - eapply (In_size dbody size) in H. cbn in *. lia.
-      - eapply (In_size id size) in H. unfold id in *; cbn in *.
-        change (fun x => size x) with size in H. lia.*)
 End Compile.
 
-Definition compile_constant_decl Σ cb := 
+Definition compile_constant_decl Σ cb :=
 	option_map (compile Σ) cb.(cst_body).
 
-Fixpoint compile_env Σ : list (string * option exp) := 
+Fixpoint compile_env Σ : list (string * option exp) :=
 	match Σ with
 	| [] => []
 	| (x,d) :: Σ => match d with
