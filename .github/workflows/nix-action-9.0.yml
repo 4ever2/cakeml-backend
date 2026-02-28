@@ -3,7 +3,7 @@ jobs:
     needs:
     - coq
     - metarocq
-    - ceres
+    - ceres-bs
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -11,7 +11,7 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
@@ -25,7 +25,7 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -64,14 +64,14 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "9.0"
         --argstr job "metarocq"
     - if: steps.stepCheck.outputs.status != 'fetched'
-      name: 'Building/fetching previous CI target: ceres'
+      name: 'Building/fetching previous CI target: ceres-bs'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "9.0"
-        --argstr job "ceres"
+        --argstr job "ceres-bs"
     - if: steps.stepCheck.outputs.status != 'fetched'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "9.0"
         --argstr job "CakeMLExtraction"
-  ceres:
+  ceres-bs:
     needs:
     - coq
     - metarocq
@@ -82,7 +82,7 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
@@ -96,7 +96,7 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -110,10 +110,10 @@ jobs:
         extraPullNames: coq-community, math-comp, metarocq, peregrine
         name: coq
     - id: stepGetDerivation
-      name: Getting derivation for current job (ceres)
+      name: Getting derivation for current job (ceres-bs)
       run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
-        \"9.0\" --argstr job \"ceres\" \\\n   --dry-run 2> err > out || (touch fail;
-        true)\ncat out err\nif [ -e fail ]; then echo \"Error: getting derivation
+        \"9.0\" --argstr job \"ceres-bs\" \\\n   --dry-run 2> err > out || (touch
+        fail; true)\ncat out err\nif [ -e fail ]; then echo \"Error: getting derivation
         failed\"; exit 1; fi\n"
     - id: stepCheck
       name: Checking presence of CI target for current job
@@ -137,7 +137,7 @@ jobs:
     - if: steps.stepCheck.outputs.status != 'fetched'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "9.0"
-        --argstr job "ceres"
+        --argstr job "ceres-bs"
   coq:
     needs: []
     runs-on: ubuntu-latest
@@ -147,7 +147,7 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
@@ -161,7 +161,7 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -205,7 +205,7 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
@@ -219,7 +219,7 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}

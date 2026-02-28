@@ -3,7 +3,7 @@ From MetaRocq.Common Require Kernames.
 
 From Stdlib Require Import String Ascii Bool Arith List.
 Set Warnings "-masking-absolute-name".
-From Ceres Require Import Ceres CeresString CeresFormat CeresSerialize.
+From CeresBS Require Import Ceres CeresString CeresFormat CeresSerialize.
 Import ListNotations.
 
 From CakeML Require Import ast namespace semanticPrimitives functions bigstep.

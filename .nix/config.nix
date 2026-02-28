@@ -14,7 +14,7 @@
     coqPackages.coq.override.version = "9.0";
     rocqPacakges.rocq-core.override.version = "9.0";
     coqPackages.metarocq.override.version = "1.4-9.0";
-    coqPackages.ceres.override.version = "dev";
+    coqPackages.ceres-bs.override.version = "master";
   };
 
   bundles."9.0".push-branches = ["main"];
