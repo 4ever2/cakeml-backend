@@ -5,7 +5,7 @@ From CakeML Require Import functions.
 From CakeML Require Import namespace.
 Import ListNotations.
 
-Definition env_ctor := namespace modN conN (nat*stamp). 
+Definition env_ctor := namespace modN conN (nat*stamp).
 
 Definition bind_stamp := ExnStamp 0.
 
@@ -13,9 +13,9 @@ Definition bind_exn_v := Conv (Some bind_stamp) [].
 
 
 Definition do_con_check (envC:env_ctor) (n_opt: option id) (l:nat):bool :=
-	match n_opt with 
+	match n_opt with
 	| None => true
-	| Some n => 
+	| Some n =>
 		match nsLookup ((nat*stamp)%type) envC n with
 		| None => false
 		| Some (l',_) => l=?l'
@@ -47,9 +47,9 @@ Definition same_type (s0:stamp) (s1:stamp) :=
 	| TypeStamp _ n0, TypeStamp _ n1 => (n0 =? n1)
 	| ExnStamp _, ExnStamp _ => true
 	| _,_ => false
-	
+
 	end.
-	
+
 Definition same_ctor (s0:stamp) (s1:stamp) :=
 	match s0,s1 with
 	| TypeStamp v0 n0, TypeStamp v1 n1 => andb (n0 =? n1) (v0 =? v1)%string
@@ -60,13 +60,13 @@ Definition same_ctor (s0:stamp) (s1:stamp) :=
 Notation env_l := (list (varN*val)).
 
 Fixpoint  pmatch_list_helper (f: env_ctor->pat->val->env_l->match_result (env_l)) envC lp lv env :=
-	match lp,lv with 
+	match lp,lv with
 	| [],[] => Match env_l env
-	| p::ps,v::vs => 
+	| p::ps,v::vs =>
 		match f envC p v env with
 		| Match_type_error _ => Match_type_error env_l
 		| Match _ env' => pmatch_list_helper f envC ps vs env'
-		| No_match _ => 
+		| No_match _ =>
 			match pmatch_list_helper f envC ps vs env with
 				|Match_type_error _ => Match_type_error env_l
 				| _ => No_match env_l
@@ -79,21 +79,21 @@ Fixpoint pmatch envC p va (env:env_l) : (match_result (env_l) ):=
 	match p,va with
 	| Pany,_ => (Match env_l env)
 	| Pvar x,_ => Match env_l ((x,va)::env)
-	| Plit l,(Litv l') => 
+	| Plit l,(Litv l') =>
 		match l,l' with
-		| StrLit l1,StrLit l2 => 
+		| StrLit l1,StrLit l2 =>
 			if (l1 =? l2)%string then
 				Match env_l env
-			else 
+			else
 				No_match env_l
 		end
 	| Pcon (Some n) ps,(Conv (Some stamp') vs) =>
 		match nsLookup (nat*stamp) envC n with
 		| Some (l,stamp0) => if andb (same_type stamp' stamp0) (List.length ps =? l) then
 								if same_ctor stamp0 stamp' then
-									if List.length vs =? l then 
+									if List.length vs =? l then
 										pmatch_list_helper pmatch envC ps vs env
-									else 
+									else
 										Match_type_error env_l
 								else
 									No_match env_l
@@ -113,19 +113,19 @@ Fixpoint pmatch envC p va (env:env_l) : (match_result (env_l) ):=
 Definition pmatch_list := pmatch_list_helper pmatch.
 
 Inductive pmatch_rel envC :pat-> val -> list (varN*val)->list (varN*val)-> Prop :=
-| pmatch_any c' env: 
+| pmatch_any c' env:
 	pmatch_rel envC Pany c' env env
 | pmatch_lit l env:
 	pmatch_rel envC (Plit (StrLit l)) (Litv (StrLit l)) env env
-| pmatch_var x v' env: 
+| pmatch_var x v' env:
 	pmatch_rel envC (Pvar x) v' env ((x,v')::env)
-| pmatch_con n l stamp0 stamp' ps vs env env': 
+| pmatch_con n l stamp0 stamp' ps vs env env':
 	nsLookup ((nat*stamp)%type) envC n = Some (l,stamp0) ->
 	stamp0 = stamp'->
 	length ps = l ->
 	length vs = l ->
 	pmatch_list_rel envC ps vs env env' ->
-	pmatch_rel envC (Pcon (Some n) ps) (Conv (Some stamp') vs) env env' 
+	pmatch_rel envC (Pcon (Some n) ps) (Conv (Some stamp') vs) env env'
 | pmatch_con_None ps vs env env':
 	length ps = length vs ->
 	pmatch_list_rel envC ps vs env env' ->
@@ -133,8 +133,8 @@ Inductive pmatch_rel envC :pat-> val -> list (varN*val)->list (varN*val)-> Prop 
 | pmatch_pas p v i env env' :
 	pmatch_rel envC p v ((i,v)::env) env' ->
 	pmatch_rel envC (Pas p i) v ((i,v)::env) env'
-with pmatch_list_rel envC : (list pat)->(list val)->list (varN*val)->list (varN*val)->Prop := 
-|pmatch_nil env: 
+with pmatch_list_rel envC : (list pat)->(list val)->list (varN*val)->list (varN*val)->Prop :=
+|pmatch_nil env:
 	pmatch_list_rel envC [] [] env env
 |pmatch_cons p ps v vs env env' env'':
 	pmatch_rel envC p v env env' ->
@@ -154,12 +154,12 @@ Fixpoint can_pmatch_all (envC:env_ctor) (l:list pat) (va:val): bool :=
 	| p::ps => 	if (is_Match_type_error (pmatch envC p va [])) then
 					false
 				else
-					can_pmatch_all envC ps va 
+					can_pmatch_all envC ps va
 	end.
 
-Inductive can_pmatch_all_rel (envC:env_ctor) :list pat->val-> Prop :=  
+Inductive can_pmatch_all_rel (envC:env_ctor) :list pat->val-> Prop :=
 	| pmatch_all_nil v: can_pmatch_all_rel envC [] v
-	| pmatch_all_cons p ps v l: 
+	| pmatch_all_cons p ps v l:
 		pmatch_rel envC p v [] l ->
 		can_pmatch_all_rel envC ps v ->
 		can_pmatch_all_rel envC (p::ps) v.
@@ -169,11 +169,11 @@ Definition build_rec_env funs cl_env add_to_env :=
 	fold_right (fun '(f, x, e) env' => nsBind f ( Recclosure  cl_env funs f) env') add_to_env funs.
 
 Fixpoint find_recfun a b (n:string) (funs:list (string*a*b)) :=
-	match funs with 
+	match funs with
 	| [] => None
 	| (f,x,e)::funs' => if (f =? n)%string then
 							Some (x,e)
-						else 
+						else
 							find_recfun a b n funs'
 	end.
 
@@ -184,10 +184,10 @@ Definition do_opapp (vs : list val) :=
 		if ALL_DISTINCT varN (fun x y => (x=?y)%string) (map (fun '(f,_,_)=>f) funs) then
 			match find_recfun varN exp n' funs with
 			| None => None
-			| Some (n,e) => 
+			| Some (n,e) =>
 				Some ({| v:= nsBind n v_q (build_rec_env funs env' env'.(v val)) ;c:=env'.(c val)|}, e)
 			end
-		else 
+		else
 			None
 	| _ => None
 	end.

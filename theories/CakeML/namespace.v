@@ -9,7 +9,7 @@ Import ListNotations.
 Inductive namespace m n v :=
 	Bind (var : list (n*v)) (  ns : list (m*namespace m n v) ).
 
-Inductive stamp := 
+Inductive stamp :=
 | TypeStamp (s:string) (n:nat)
 | ExnStamp (n:nat).
 
@@ -37,7 +37,7 @@ Definition alist_to_ns a :=
 
 Definition nsBind (n:varN) (x:val) v :=
 	match v with
-		|Bind _ _ _ var ns => Bind modN varN val ((n,x)::var) ns 
+		|Bind _ _ _ var ns => Bind modN varN val ((n,x)::var) ns
 end.
 
 Fixpoint nsLookup c (env :  namespace modN varN c) (n : id):option c :=
@@ -46,7 +46,7 @@ Fixpoint nsLookup c (env :  namespace modN varN c) (n : id):option c :=
 	| Bind _ _ _ _ m , Long mn n =>
 		match ALOOKUP ( namespace modN string c) m mn with
 		| Some env' => nsLookup c env' n
-		| None => None 
+		| None => None
 	end
 end.
 
@@ -57,6 +57,6 @@ Definition nsOptBind (n:option varN) (x:val) env :=
 	end.
 
 Definition nsAppend env1 env2 :=
-	match env1,env2 with 
+	match env1,env2 with
 	|Bind _ _ _ v1 m1, Bind _ _ _ v2 m2 => Bind modN varN val (v1++v2) (m1 ++ m2)
 end.
