@@ -12,7 +12,7 @@ Notation conN := string (only parsing).
 
 
 Inductive id :=
-| Short (n:varN) 
+| Short (n:varN)
 | Long (m:modN) (nm:id). (*mn : module name*)
 
 Inductive op_class := (*operator class to group behavior*)
@@ -53,12 +53,12 @@ Inductive exp :=
 
 
 Fixpoint pat_bindings_list_helper (f:pat->list varN->list varN) (l:list pat) (already_bound:list varN):list varN :=
-match l with 
+match l with
 | [] => already_bound
 | p::ps => pat_bindings_list_helper f ps (f p already_bound)
 end.
 
-Fixpoint pat_bindings (p:pat) (already_bound:list varN):list varN:= 
+Fixpoint pat_bindings (p:pat) (already_bound:list varN):list varN:=
 match p with
 | Pany |Plit _  => already_bound
 | Pvar n => (n::already_bound)

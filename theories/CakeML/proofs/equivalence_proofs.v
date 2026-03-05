@@ -21,18 +21,18 @@ Proof.
 		+ rewrite H0, H1. unfold return_def. auto.
 		+ unfold do_con_check in H0. unfold do_con_check.
 			assert (rev [e] = [e]) by easy.
-			rewrite <- H3. rewrite <- rev_app_distr. rewrite rev_involutive. simpl.  
+			rewrite <- H3. rewrite <- rev_app_distr. rewrite rev_involutive. simpl.
 			destruct n eqn:?; try easy.
 			destruct ( nsLookup (nat * stamp) (c val env) i) eqn:?;try easy.
 			destruct p eqn:?. simpl in H0. rewrite H0. easy.
 		+  apply eq_distinct_list in H0. rewrite H0; easy.
 		+  unfold application. rewrite H0. destruct o. simpl. auto.
-		+ inversion H0. 
+		+ inversion H0.
 			* unfold ALL_DISTINCT. rewrite H1. easy.
 			*  apply eq_distinct_list in H0. rewrite <- H4 in H0. rewrite H0.
 				rewrite H1; easy.
 		+  apply eq_distinct_list in H0. rewrite H0,H1. easy.
-		+ rewrite H0; easy. 
+		+ rewrite H0; easy.
 		+ rewrite H0,H1. unfold return_def. easy.
 		+ rewrite H0. easy.
 		+ destruct c0 eqn:?.
@@ -49,7 +49,7 @@ Proof.
 			* destruct (do_con_check (c val s) n (Datatypes.length es)) eqn:?; try easy.
 				destruct (rev es) eqn:?.
 				-- destruct (build_conv (c val s) n []) eqn:?; try easy.
-					unfold return_def in H1. inversion H1. 
+					unfold return_def in H1. inversion H1.
 					apply rev_symm in Heql1; simpl in Heql1.
 					rewrite Heql1 in *.
 					apply e_step_Con_nil; try easy.
@@ -69,29 +69,29 @@ Proof.
 				inversion H1; subst.
 				apply e_step_Letrec.
 				apply eq_distinct_list; easy.
-		+ unfold continue in H1. destruct l. 
+		+ unfold continue in H1. destruct l.
 			* inversion H.
 			*  do 2 destruct c eqn:?. inversion Heqc0. destruct c0 eqn:?. destruct u. destruct e eqn:?.
-				-- unfold application in H1. destruct o. destruct (getOpClass Opapp). destruct (do_opapp (v::v0)) eqn:?. 
+				-- unfold application in H1. destruct o. destruct (getOpClass Opapp). destruct (do_opapp (v::v0)) eqn:?.
 					++ destruct p. inversion H1. apply e_step_val1. exact Heqo.
 					++ inversion H1.
 				--  unfold push in H1. inversion H1. apply e_step_val2.
-				--  destruct u. 
+				--  destruct u.
 					inversion H1; subst.
 					constructor.
-				-- destruct u. 
+				-- destruct u.
 					destruct (can_pmatch_all (namespace.c val s0) (map fst ps) v) eqn:?; try easy.
 					inversion H1; subst.
-					apply e_step_Cmat_check; easy. 
+					apply e_step_Cmat_check; easy.
 				-- destruct u,ps eqn:?; try easy.
 					++ inversion H1; subst. constructor.
 					++ destruct p eqn:?.
 						destruct (ALL_DISTINCT conN (fun x y : conN => negb (x =? y)%string) (pat_bindings p1 [])) eqn:?.
 						destruct (pmatch (namespace.c val s0) p1 v []) eqn:?; subst; try easy.
-						** inversion H1. 
+						** inversion H1.
 							apply e_step_Cmat_NM; try easy.
-							apply eq_distinct_list. easy. 
-						** inversion H1; subst. 
+							apply eq_distinct_list. easy.
+						** inversion H1; subst.
 							apply e_step_Cmat_M; try easy.
 							apply eq_distinct_list; easy.
 						** easy.
@@ -118,7 +118,7 @@ Theorem big_to_small : forall env,(forall e bv, evaluate env e  bv -> exists env
 						(forall v pes err_v bv  , evaluate_match env v pes err_v bv -> (exists env', small_eval_match env v pes env' err_v bv)).
 Proof.
 	intro env.
-	apply evaluate_mutual_ind 
+	apply evaluate_mutual_ind
     with (P := fun env e bv H =>  exists env', RTC small_state e_step_rel (env, Exp e, []) (env', to_small_result bv , []))
         (P0 := fun env es vs H => exists env', small_eval_list env es env' vs)
 		(P1 := fun env v pes err_v bv H => exists env', small_eval_match env v pes env' err_v bv).
@@ -159,7 +159,7 @@ Proof.
 		apply RTC_trans with (env'0, Exn v, [(Chandle tt pes, env0)]).
 		+ apply e_step_indep_c with (c:=[])(l:=[])(c':=[(Chandle tt pes, env0)]); easy.
 		+ apply transitivity with (env'0, Val v,[(Cmat_check tt pes v, env0)] ); try constructor.
-			
+
 			apply transitivity with (env0, Val v, [(Cmat tt pes v, env0)]); try (constructor; easy).
 			remember bv.
 			set (v0 := v).
@@ -172,7 +172,7 @@ Proof.
 			induction RTC_match_pes.
 			* intros. rewrite H1. apply transitivity with ({| v := nsAppend (alist_to_ns env') (namespace.v val env0); c := c val env0 |}, Exp e0, []); try easy.
 				constructor; try easy.
-				-- apply eq_distinct_list_rel; easy. 
+				-- apply eq_distinct_list_rel; easy.
 			* intros. apply transitivity with (env0, Val va, [(Cmat tt pes va, env0)]); try constructor.
 				-- apply eq_distinct_list_rel; easy.
 				-- easy.
@@ -191,13 +191,13 @@ Proof.
 		exists env0. apply transitivity with (env0, Val v1, []).
 		+ constructor; exact Look.
 		+ apply reflexivity.
-	
+
 	- intros.
-		exists env0. 
+		exists env0.
 		apply transitivity with  (env0, Val (Closure env0 n e), []).
 		+ apply e_step_Fun.
 		+ apply reflexivity.
-	
+
 	- intros env0 op es bv vs env' e eval_rev_es small_eval_rev_es do_opapp_vs eval_e RTC_e op_class.
 		destruct RTC_e as [env'0 RTC_e]; exists env'0.
 		assert (do_opapp_vs' := do_opapp_vs).
@@ -219,7 +219,7 @@ Proof.
 				apply e_step_App.
 			-- apply RTC_trans with (env'3, Val v0, [(Capp op [] tt [e0],env0)]).
 				++ apply e_step_indep_c with (c':=  [(Capp op [] tt [e0],env0)])( c:=[] )(l:=[]). easy.
-				++ apply transitivity with (env0,Exp e0,[(Capp op [v0] tt [],env0)]). 
+				++ apply transitivity with (env0,Exp e0,[(Capp op [v0] tt [],env0)]).
 					apply e_step_val2.
 					apply RTC_trans with (env'2 ,Val v,[(Capp op [v0] tt [],env0)]).
 					** apply e_step_indep_c with (c':= [(Capp op [v0] tt [],env0)])( c:=[] )(l:=[]). easy.
@@ -303,7 +303,7 @@ Proof.
 				++ apply transitivity with (env0, Val v, []); try constructor.
 					** simpl. simpl in e. easy.
 					** inversion H7; subst. inversion Heql0; subst. auto.
-			-- apply rev_symm in Heql1. simpl in Heql1. 
+			-- apply rev_symm in Heql1. simpl in Heql1.
 				rewrite  Heql1 in *.
 				assert (small_eval_list env0 (rev (rev l1 ++ [e3])) env' (Rval_l (rev vs0))).
 				++ assert (eq_env := H5); apply eval_eq_env in eq_env.
@@ -330,7 +330,7 @@ Proof.
 						destruct Heql0.
 						subst.
 						apply transitivity with (env0, Val v, []); try constructor.
-						--- rewrite length_rev in e. simpl in e. 
+						--- rewrite length_rev in e. simpl in e.
 							rewrite rev_concat_1_elt in e. rewrite length_rev in e.
 							assert (List.length (e3::l1) =List.length (v2::vs)).
 							+++ apply eval_list_length with env0 env'.
@@ -345,7 +345,7 @@ Proof.
 								rewrite PeanoNat.Nat.add_1_r.
 								easy.
 						--- easy.
-	- intros env0 cn es err con_check eval_rev_es small_eval_rev_es. 
+	- intros env0 cn es err con_check eval_rev_es small_eval_rev_es.
 		destruct small_eval_rev_es as [env' small_eval_rev_es].
 		exists env'.
 		clear eval_rev_es.
@@ -366,10 +366,10 @@ Proof.
 				set (vs:=[]).
 				assert (vs=([]:list val)) by auto.
 				rewrite <- H in con_check.
-				
+
 				revert H3 con_check.
-				
-				
+
+
 				generalize vs e env'0 v.
 				induction H4; try easy.
 				-- intros vs0 e1 env'1 v1 eval_e1 do_con.
@@ -387,7 +387,7 @@ Proof.
 					++ apply e_step_indep_c with (c:=[])(l:=[])(c':= [(Ccon cn vs0 tt (e0 :: es), env0)]); easy.
 					++ apply transitivity with (env0, Exp e0, [(Ccon cn (v2::vs0) tt  es, env0)]); try constructor.
 						** rewrite <- do_con. f_equal. rewrite length_rev. simpl; lia.
-						** apply IHsmall_eval_list with env' v1; try easy. rewrite <- do_con. 
+						** apply IHsmall_eval_list with env' v1; try easy. rewrite <- do_con.
 						f_equal. do 2 rewrite length_rev. simpl. lia.
 	- intros env0 e pes v bv eval_e RTC_e eval_pes small_eval_pes can_pmatch_pes.
 		destruct RTC_e as [env'0 RTC_e].
@@ -423,7 +423,7 @@ Proof.
 		apply transitivity with (env0, Exp e,[(Cmat_check tt pes bind_exn_v,env0)]); try constructor.
 		apply RTC_trans with (env', to_small_result (Rerr err),[(Cmat_check tt pes bind_exn_v, env0)]).
 		+ apply e_step_indep_c with (c:=[])(l:=[])(c':=[(Cmat_check tt pes bind_exn_v, env0)]); easy.
-		+ destruct err; simpl. 
+		+ destruct err; simpl.
 		apply transitivity with (env', Exn v, []); try constructor.
 		simpl; easy.
 
@@ -442,7 +442,7 @@ Proof.
 		destruct small_eval_vs.
 		assert (H':=H).
 		apply eval_eq_env in H.
-		rewrite <- H in H'. 
+		rewrite <- H in H'.
 		auto.
 	-intros env0 e es err eval_e RTC_e.
 		destruct RTC_e as [env' RTC_E].
@@ -455,12 +455,12 @@ Proof.
 		destruct err.
 		exists env'.
 		apply small_eval_cons_err with env'0 v; try easy.
-	- intros env0 e p pes va bv env' err_v all_dist pmatch_p_va eval_e RTC_e. 
+	- intros env0 e p pes va bv env' err_v all_dist pmatch_p_va eval_e RTC_e.
 	destruct RTC_e as [env'0 RTC_e].
 		exists env'0.
-	apply small_eval_match_M with (to_small_result bv) (env') ; try easy. 
+	apply small_eval_match_M with (to_small_result bv) (env') ; try easy.
 	- intros. destruct H.
-		exists x. 
+		exists x.
 		apply small_eval_match_NM; try easy.
 	- intros env0 va err_v.
 		exists env0.
@@ -468,7 +468,7 @@ Proof.
 Qed.
 
 
-Lemma one_step_backward : 
+Lemma one_step_backward :
 	forall env e c env' e' c' bv, e_step_rel (env,e,c) (env',e',c') ->
 	evaluate_state (env',e',c') bv ->
 	evaluate_state (env,e,c) bv.
@@ -508,7 +508,7 @@ Proof.
 		+ apply evaluate_Con with []; try easy. simpl. constructor.
 		+ inversion H0. easy.
 
-	-  inversion H0; subst. 
+	-  inversion H0; subst.
 		inversion H6; subst.
 		inversion H8; subst.
 		+ apply evaluate_state_exp with (Rval v'); try easy.
@@ -598,7 +598,7 @@ Proof.
 		apply evaluate_state_val.
 		apply evaluate_ctxts_cons with res; try easy.
 		apply evaluate_ctxt_Cmat_check; try easy.
-	
+
 	- inversion H0; subst.
 		apply evaluate_state_val.
 		apply evaluate_ctxts_cons with (Rval v'); try easy.
@@ -617,7 +617,7 @@ Proof.
 				rewrite PeanoNat.Nat.add_1_l with (n:=  Datatypes.length es) in H4.
 				easy.
 			* simpl. rewrite <- app_assoc. easy.
-			* constructor; easy. 
+			* constructor; easy.
 		+  constructor.
 			inversion H6; subst.
 			apply evaluate_ctxts_cons with (Rerr err); try easy.
@@ -632,7 +632,7 @@ Proof.
 	- inversion H0; subst.
 		inversion H4; subst.
 		+ apply evaluate_state_val.
-			apply evaluate_ctxts_cons with (Rerr (Rraise va)); try easy. 
+			apply evaluate_ctxts_cons with (Rerr (Rraise va)); try easy.
 			constructor.
 		+ constructor.
 			apply evaluate_ctxts_cons with (Rerr (Rraise va)); try easy.
@@ -657,8 +657,8 @@ Proof.
 Qed.
 
 
-Theorem  small_exp_to_big_exp : 
-	forall env e c env' e' c', RTC small_state e_step_rel (env,e,c) (env',e',c') -> 
+Theorem  small_exp_to_big_exp :
+	forall env e c env' e' c', RTC small_state e_step_rel (env,e,c) (env',e',c') ->
 	forall r, evaluate_state (env',e',c') r ->
 	evaluate_state (env,e,c) r.
 Proof.
@@ -670,15 +670,15 @@ Proof.
 	apply IHRTC; try easy.
 Qed.
 
-Theorem small_big_exp_equiv: 
+Theorem small_big_exp_equiv:
 	forall env e br ,(exists env', RTC small_state e_step_rel (env, Exp e, []) (env', to_small_result br, [])) <->
 	evaluate env e br.
 Proof.
 	intros.
-	split; intro. 
+	split; intro.
 	- destruct H. apply small_exp_to_big_exp with (r:=br) in H.
-		+ inversion H. 
-			inversion H5. 
+		+ inversion H.
+			inversion H5.
 			rewrite H8 in H4.
 			easy.
 		+ destruct br; simpl.

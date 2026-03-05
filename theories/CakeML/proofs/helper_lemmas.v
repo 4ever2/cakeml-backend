@@ -43,13 +43,13 @@ Lemma eq_not_mem : forall a l, NOT_MEM conN (fun x0 y : conN => negb (x0 =? y)%s
 Proof.
 	intros.
 	split; intro.
-	- intro. unfold NOT_MEM in H. induction l; try easy. 
+	- intro. unfold NOT_MEM in H. induction l; try easy.
 		inversion H0.
-		+ apply andb_prop in H. destruct H. apply Bool.negb_true_iff in H. apply eqb_neq in H. easy. 
+		+ apply andb_prop in H. destruct H. apply Bool.negb_true_iff in H. apply eqb_neq in H. easy.
 		+ apply andb_prop in H. destruct H. apply IHl; try easy.
 	- unfold NOT_MEM. induction l; try easy.
 	apply Bool.andb_true_iff. split.
-		+ apply Bool.negb_true_iff. apply eqb_neq. 
+		+ apply Bool.negb_true_iff. apply eqb_neq.
 		apply not_in_cons in H. destruct H; easy.
 		+ apply IHl.
 		apply not_in_cons in H. destruct H; easy.
@@ -63,8 +63,8 @@ Proof.
 		simpl. intro. destruct H1; contradiction.
 	- induction l; try constructor.
 		+ unfold In in H. apply Decidable.not_or in H. destruct H; easy.
-		+ apply IHl. unfold In in H. 
-		apply Decidable.not_or in H. 
+		+ apply IHl. unfold In in H.
+		apply Decidable.not_or in H.
 		destruct H; easy.
 Qed.
 
@@ -73,7 +73,7 @@ Proof.
 	intros.
 	split; intro.
 	- induction l; constructor.
-		* unfold ALL_DISTINCT in H. 
+		* unfold ALL_DISTINCT in H.
 			apply eq_not_mem. apply Bool.andb_true_iff in H. destruct H; easy.
 		* apply IHl. apply Bool.andb_true_iff in H. destruct H; easy.
 	- unfold ALL_DISTINCT. induction l; try easy.
@@ -99,7 +99,7 @@ Proof.
 	intros.
 	generalize y.
 	induction H; try easy.
-	intro. 
+	intro.
 	apply transitivity with y; try easy.
 	apply IHRTC; try easy.
 Qed.
@@ -111,7 +111,7 @@ Proof.
 	- intros. inversion H; subst. simpl; easy.
 	- intros. inversion H; subst.
 		apply small_eval_cons with env'0; try easy.
-		apply IHes1; try easy. 
+		apply IHes1; try easy.
 Qed.
 
 Lemma eval_eq_env : forall env env' es vs,small_eval_list env es env' (Rval_l vs) -> env = env'.
@@ -157,24 +157,24 @@ Proof.
 	generalize env.
 	generalize e.
 	generalize c.
-	induction H. 
-	+ intros.  
+	induction H.
+	+ intros.
 		destruct x. destruct p. inversion H1. inversion H0. rewrite <- H4.
-		rewrite <- H2. rewrite <- H3. rewrite <- H5. rewrite <- H6. rewrite H7.  
+		rewrite <- H2. rewrite <- H3. rewrite <- H5. rewrite <- H6. rewrite H7.
 		apply reflexivity.
 	+ intros. destruct y. apply transitivity with (p, l0++c').
-		rewrite H2 in H. destruct p. apply e_step_indep_c_step; try easy. 
+		rewrite H2 in H. destruct p. apply e_step_indep_c_step; try easy.
 		destruct p.
 		apply IHRTC; try easy.
 Qed.
 
 
-Lemma eval_cons : forall env env'' e1 es e2 v1 vs v2 cn env' vs0, 
-	small_eval_list env (e1::es++[e2]) env'' (Rval_l (v1::vs++[v2])) -> 
+Lemma eval_cons : forall env env'' e1 es e2 v1 vs v2 cn env' vs0,
+	small_eval_list env (e1::es++[e2]) env'' (Rval_l (v1::vs++[v2])) ->
 	do_con_check (c val env) cn (Datatypes.length ( es ++ [e1]) + 1 + (List.length vs0)) = true ->
 	RTC small_state e_step_rel (env, Exp e1, []) (env', Val v1, []) ->
 	RTC small_state e_step_rel (env, Exp e2,  [(Ccon cn vs0 tt (es++[e1]),env)]) (env', Val v1,[(Ccon cn (rev vs ++ [v2]++vs0) tt [],env)]).
-Proof. 
+Proof.
 	intros env env'' e1 es.
 	induction es.
 	- intros.
@@ -191,7 +191,7 @@ Proof.
 		apply RTC_trans with (env'1, Val v2, [(Ccon cn vs0 tt [e1], env'')]).
 		+ apply e_step_indep_c with (c:=[])(l:=[])(c':=[(Ccon cn vs0 tt [e1], env'')]); easy.
 		+ apply transitivity with (env'', Exp e1, [(Ccon cn (v2 :: vs0) tt [], env'')]).
-			* constructor. 
+			* constructor.
 				simpl in H0.
 				simpl.
 				assert (Datatypes.length vs0 + 1 + 1 + 0 = S (S (Datatypes.length vs0))) by lia.
@@ -237,12 +237,12 @@ Proof.
 						apply eval_rev in H12.
 						do 2 rewrite rev_involutive in H12.
 						apply small_eval_cons with env'2; try easy.
-	
-					++ simpl. simpl in H0. 
+
+					++ simpl. simpl in H0.
 						assert (Datatypes.length (es ++ [e1]) + 1 + S (Datatypes.length vs0) = S (Datatypes.length (es ++ [e1]) + 1 + Datatypes.length vs0)) by lia.
 						rewrite H2; easy.
 Qed.
-	
+
 
 Lemma eval_list_length : forall env env' es vs, small_eval_list env es env' (Rval_l vs) -> List.length es = List.length vs.
 Proof.
@@ -252,7 +252,7 @@ Proof.
 	+ inversion H; subst.
 		simpl.
 		apply eq_S.
-		apply IHes. 
+		apply IHes.
 		auto.
 Qed.
 
@@ -265,4 +265,3 @@ Proof.
 		+ destruct l; try easy.
 		inversion H. destruct v; try easy.
 Qed.
-

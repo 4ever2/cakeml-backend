@@ -10,15 +10,15 @@ Import ListNotations.
 
 
 (* https://github.com/CakeML/cakeml/blob/master/semantics/alt_semantics/bigStepScript.sml#L68 *)
-Inductive evaluate (env : Sem_env val) : exp -> result -> Prop := 
+Inductive evaluate (env : Sem_env val) : exp -> result -> Prop :=
 
 | evaluate_raise e v :
 	evaluate env e (Rval v) ->
-	evaluate env (Raise e) (Rerr (Rraise v)) 
+	evaluate env (Raise e) (Rerr (Rraise v))
 
 | evaluate_raise_err e err:
 	evaluate env e (Rerr err) ->
-	evaluate env (Raise e) (Rerr err) 
+	evaluate env (Raise e) (Rerr err)
 
 | evaluate_lit l:
 	evaluate env (Lit l) (Rval (Litv l))
@@ -51,12 +51,12 @@ Inductive evaluate (env : Sem_env val) : exp -> result -> Prop :=
 	evaluate_list env (rev es) (Rerr_l err) ->
 	evaluate env (App op es) (Rerr err)
 
-| evaluate_Let n e1 e2 va bv : 
+| evaluate_Let n e1 e2 va bv :
 	evaluate env e1 (Rval va) ->
 	evaluate ({|v:=( nsOptBind n va env.(v val)); c:= env.(c val) |}) e2 bv ->
 	evaluate env (Let n e1 e2) bv
 
-| evaluate_Let_err n e1 e2 err : 
+| evaluate_Let_err n e1 e2 err :
 	evaluate env e1 (Rerr err) ->
 	evaluate env (Let n e1 e2) (Rerr err)
 
@@ -89,7 +89,7 @@ Inductive evaluate (env : Sem_env val) : exp -> result -> Prop :=
 
 with evaluate_list (env : Sem_env val) : list exp -> list_result -> Prop :=
 | evaluate_nil :
-	evaluate_list env [] (Rval_l [])	
+	evaluate_list env [] (Rval_l [])
 
 | evaluate_cons e es v vs :
 	evaluate env e (Rval v) ->
@@ -107,13 +107,13 @@ with evaluate_list (env : Sem_env val) : list exp -> list_result -> Prop :=
 
 with evaluate_match (env : Sem_env val) :val-> list (pat*exp) -> val -> result->Prop :=
 | evaluate_match_M e p pes va bv env' err_v:
-	ALL_DISTINCT_rel conN  (pat_bindings p []) -> 
+	ALL_DISTINCT_rel conN  (pat_bindings p []) ->
 	pmatch env.(c val) p va [] = Match env_l env'  ->
 	evaluate {| v:= nsAppend (alist_to_ns env') env.(v val); c:= env.(c val) |} e bv ->
 	evaluate_match env va ((p,e)::pes) err_v bv
 
 | evaluate_match_NM e p pes va bv err_v:
-	ALL_DISTINCT_rel conN  (pat_bindings p []) -> 
+	ALL_DISTINCT_rel conN  (pat_bindings p []) ->
 	pmatch env.(c val) p va [] = No_match env_l ->
 	evaluate_match env va (pes) err_v bv ->
 	evaluate_match env va ((p,e)::pes) err_v bv
@@ -126,4 +126,3 @@ with evaluate_list_mut_ind := Induction for evaluate_list Sort Prop
 with evaluate_match_mut_ind := Induction for evaluate_match Sort Prop.
 
 Combined Scheme evaluate_mutual_ind from evaluate_mut_ind, evaluate_list_mut_ind,evaluate_match_mut_ind.
-
