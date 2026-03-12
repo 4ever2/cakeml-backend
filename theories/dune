@@ -1,0 +1,19 @@
+(rocq.theory
+  (name CakeML)
+  (package rocq-cakeml-extraction)
+  (synopsis "CakeML backend for Peregrine")
+  (modules :standard \
+    Tests
+    )
+  (flags )
+  (theories
+    Ltac2
+    Stdlib
+    Equations
+    ExtLib
+    MetaRocq
+    CeresBS
+    )
+  )
+
+(include_subdirs qualified)

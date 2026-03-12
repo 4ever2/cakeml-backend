@@ -39,3 +39,6 @@ Makefile.rocq*
 
 ### Nix ###
 result
+
+### Dune ###
+_build/
