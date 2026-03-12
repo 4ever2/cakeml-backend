@@ -40,7 +40,7 @@ Import Transform.Transform.
 
 Import EWcbvEval.
 
-From CakeML Require Import Compile Serialize.
+From CakeML.Backend Require Import Compile Serialize.
 
 Record malfunction_pipeline_config :=
   { erasure_config :> erasure_configuration;
