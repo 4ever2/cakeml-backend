@@ -36,3 +36,6 @@ nra.cache
 native_compute_profile_*.data
 
 Makefile.rocq*
+
+### Nix ###
+result

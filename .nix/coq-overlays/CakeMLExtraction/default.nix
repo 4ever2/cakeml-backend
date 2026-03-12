@@ -4,7 +4,7 @@
   coq,
   ceres-bs,
   equations,
-  metarocq,
+  metarocq-erasure-plugin,
   version ? null,
 }:
 
@@ -19,12 +19,12 @@
   mlPlugin = false;
   useDune = false;
 
-  buildInputs = [ equations metarocq ceres-bs ];
+  buildInputs = [ equations metarocq-erasure-plugin ceres-bs ];
   propagatedBuildInputs = [ coq.ocamlPackages.findlib ];
 
   meta = with lib; {
     homepage = "https://peregrine-project.github.io/";
     description = "CakeML backend for Peregrine";
-    maintainers = with maintainers; [ mattam82 ];
+    maintainers = with maintainers; [ _4ever2 ];
   };
 })
