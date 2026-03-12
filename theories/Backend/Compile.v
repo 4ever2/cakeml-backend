@@ -84,8 +84,8 @@ Notation Error s := (Raise (Lit( StrLit s))).
 
 Equations? compile (t: term) : exp
 	by wf t (fun x y : EAst.term => size x < size y) :=
-	| tVar na =>  Var (Short (String.to_string na))
-	| tLambda nm bod =>   Fun (String.to_string (BasicAst.string_of_name nm))  (compile bod)
+	| tVar na => Var (Short (String.to_string na))
+	| tLambda nm bod => Fun (String.to_string (BasicAst.string_of_name nm)) (compile bod)
 	| tLetIn nm dfn bod =>
 		Let (Some (String.to_string (BasicAst.string_of_name nm ))) (compile dfn) (compile bod)
 	| tApp fn arg =>
