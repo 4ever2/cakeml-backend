@@ -13,7 +13,7 @@
   bundles."9.0" = { coqPackages = {
       coq.override.version = "9.0";
       metarocq.override.version = "1.4-9.0.1";
-      ceres-bs.override.version = "master";
+      ceres-bs.override.version = "1.0.0";
     }; rocqPackages = {
       rocq-core.override.version = "9.0";
     };
@@ -21,7 +21,7 @@
   bundles."9.1" = { coqPackages = {
       coq.override.version = "9.1";
       metarocq.override.version = "1.4.1-9.1";
-      ceres-bs.override.version = "master";
+      ceres-bs.override.version = "1.0.0";
     }; rocqPackages = {
       rocq-core.override.version = "9.1";
     };
