@@ -1,6 +1,6 @@
 From MetaRocq.Utils Require Import bytestring utils.
 From Stdlib Require Import String Ascii Bool ZArith List.
-From Ceres Require Import Ceres CeresUtils CeresString CeresFormat CeresDeserialize.
+From CeresBS Require Import Ceres CeresUtils CeresString CeresFormat CeresDeserialize.
 Import ListNotations.
 
 From CakeML Require Import FullAst.
